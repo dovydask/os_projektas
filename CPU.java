@@ -62,6 +62,9 @@ public class CPU{
 		try{
 			command(mem.read(IC));	//Skaitom komandą iš atminties žodžio, nurodyto IC.
 			checkInterrupts();
+			if(1 == 0){
+				throw new MemoryException();
+			}
 		}
 		catch(MemoryException e){	
 			/*
@@ -79,6 +82,7 @@ public class CPU{
 		try{
 			switch(instruction){
 				case PUSH: {
+					System.out.println("PUSH");
 					SP++;
 					mem.write(mem.read(Word.wordToInt(word)), SP);
 					break;
@@ -91,6 +95,7 @@ public class CPU{
 				}
 				
 				case ADD: {
+					System.out.println("ADD");
 					mem.write(Word.intToWord(Word.wordToInt(mem.read(SP)) + Word.wordToInt(mem.read(SP-1))), SP-1);
 					SP--;
 					break;
@@ -115,7 +120,7 @@ public class CPU{
 				}
 				
 				case CMP: {
-					if(Word.wordToInt(mem.read(SP-1)) = Word.wordToInt(mem.read(SP))){
+					if(Word.wordToInt(mem.read(SP-1)) == Word.wordToInt(mem.read(SP))){
 						CF = 0;
 					}
 					else if(Word.wordToInt(mem.read(SP-1)) < Word.wordToInt(mem.read(SP))){
@@ -184,6 +189,7 @@ public class CPU{
 				}
 				
 				case READSI: {
+					System.out.println("READSI");
 					SI = 6;
 					break;
 				}
@@ -198,6 +204,9 @@ public class CPU{
 					break;
 				}
 			}
+			if(1 == 0){
+				throw new MemoryException();
+			}
 		}
 		catch(MemoryException e){
 			//TODO
@@ -207,79 +216,72 @@ public class CPU{
 	private void checkInterrupts(){
 		switch(SI){
 			case 1: {
-				System.out.println("SI = 1\n");
 				break;
 			}
 			
 			case 2: {
-				System.out.println("SI = 2\n");
 				break;
 			}
 			
 			case 3: {
-				System.out.println("SI = 3\n");
 				break;
 			}
 			
 			case 4: {
-				System.out.println("SI = 4\n");
 				break;
 			}
 			
 			case 5: {
-				System.out.println("SI = 5\n");
 				break;
 			}
 			
 			case 6: {
-				System.out.println("SI = 6\n");
 				break;
 			}
 			
 			case 7: {
-				System.out.println("SI = 7\n");
 				break;
 			}
 			
 			default: {
-				System.out.println("SI = ?\n");
 				break;
 			}
 		}
+		//System.out.println("SI = " + SI);
 		SI = 0;
 		
 		switch(PI){	
 			case 1: {
-				System.out.println("PI = 1\n");
 				break;
 			}
 			
 			case 2: {
-				System.out.println("PI = 2\n");
 				break;
 			}
 			
 			case 3: {
-				System.out.println("PI = 3\n");
 				break;
 			}
 			
 			case 4: {
-				System.out.println("PI = 4\n");
 				break;
 			}
 			
 			default: {
-				System.out.println("PI = ?\n");
 				break;
 			}
 		}
+		//System.out.println("PI = " + PI);
 		PI = 0;
 		
 		if(TI == 0){
 			//TODO
-			System.out.println("TI = 0\n");
+			System.out.println("TI = 0");
 			TI = 50;
 		}
+	}
+	
+	public int getTI(){
+		return TI;
 	}
 }

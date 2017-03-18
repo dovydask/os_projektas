@@ -1,0 +1,3 @@
+class MemoryException extends Exception{
+	
+}
