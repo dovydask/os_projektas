@@ -216,6 +216,7 @@ public class CPU{
 	private void checkInterrupts(){
 		switch(SI){
 			case 1: {
+				
 				break;
 			}
 			
