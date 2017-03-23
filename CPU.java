@@ -134,14 +134,14 @@ public class CPU{
 			switch(instruction){
 				case PUSH: {
 					System.out.println("PUSH");
-					byte[] SP = addressConversion(this.SP);
+					byte[] sp = addressConversion(this.SP);
 					byte[] temp = iterateAndConvert(this.IC, 1);
 					byte x = mem.read(temp);
 					temp = iterateAndConvert(this.IC, 2);
 					byte y = mem.read(temp);
 					byte[] xy = {x, y};
 					xy = addressConversion(xy);
-					SP = iterateRegister(SP, 1);
+					sp = iterateRegister(sp, 1);
 					mem.write(xy, SP);
 					this.SP = iterateRegister(this.SP, 1);
 					this.IC = iterateRegister(this.IC, 3);
@@ -184,7 +184,7 @@ public class CPU{
 				}
 				
 				case CMP: {
-					System.out.println("STOP");
+					System.out.println("CMP");
 					byte[] sp = addressConversion(this.SP);
 					byte x = mem.read(sp);
 					sp = iterateAndConvert(this.SP, -1);
@@ -259,8 +259,9 @@ public class CPU{
 				}
 				
 				case STOP: {
-					System.out.println("STOP");
+					System.out.println("STOP (QUITS PROGRAM)");
 					SI = 7;
+					System.exit(0);
 					//this.IC = iterateRegister(this.IC, 1);
 					break;
 				}
