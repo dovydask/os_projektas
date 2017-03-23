@@ -30,21 +30,22 @@ public class CPU{
 	private int PTR;
 	private int IC;
 	private int SP;
-	private int CDR;
+	public Byte[] CDR = { new Byte((byte) 0), new Byte((byte) 0), new Byte((byte) 0), new Byte((byte) 0),
+	new Byte((byte) 0) };
 	private int R;
 	private int CF;
 	
-	private Memory mem;	//Bendroji atmintis! Žodžių įrašymo/skaitymo operacijos vykdomos perduodant adresus šiai klasei.
+	private Memory mem;	//Bendroji atmintis! Žodži? ?rašymo/skaitymo operacijos vykdomos perduodant adresus šiai klasei.
 	
 	public CPU(){
 		MODE = 	1;
 		SI = 	0;
-		TI = 	50;	//Taimerio skaitliukas. 50 laiko vienetų (ciklo iteracijų).
+		TI = 	50;	//Taimerio skaitliukas. 50 laiko vienet? (ciklo iteracij?).
 		PI = 	0;
 		PTR = 	0;
 		IC = 	0;
 		SP = 	0;
-		CDR =	0;
+		//CDR =	0;
 		R = 	0;
 		CF = 	0;
     }
@@ -60,7 +61,7 @@ public class CPU{
 	//Mašininis ciklas
 	public void cycle(){
 		try{
-			command(mem.read(IC));	//Skaitom komandą iš atminties žodžio, nurodyto IC.
+			command(mem.read(IC));	//Skaitom komand? iš atminties žodžio, nurodyto IC.
 			checkInterrupts();
 			if(1 == 0){
 				throw new MemoryException();
@@ -68,7 +69,7 @@ public class CPU{
 		}
 		catch(MemoryException e){	
 			/*
-			TODO: Kažką darom, kilus atminties išimčiai. Tikriausiai reiks nustatyti programinius
+			TODO: Kažk? darom, kilus atminties išim?iai. Tikriausiai reiks nustatyti programinius
 			pertraukimus (PI) - nepakanka atminties, neteisingas adresas ir pan.
 			*/
 		}
@@ -77,8 +78,8 @@ public class CPU{
 	
 	private void command(Word word){
 		IC++;
-		byte instruction = word.getByte(3);	//Instrukcijos kodą laikome paskutiniame žodžio baite.
-		word.setByte(3, (byte) 0);	//Užnulinam paskutinį žodžio baitą. Pirmuose 3-juose baituose užrašytas adresas.
+		byte instruction = word.getByte(3);	//Instrukcijos kod? laikome paskutiniame žodžio baite.
+		word.setByte(3, (byte) 0);	//Užnulinam paskutin? žodžio bait?. Pirmuose 3-juose baituose užrašytas adresas.
 		try{
 			switch(instruction){
 				case PUSH: {
