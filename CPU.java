@@ -13,24 +13,23 @@ public class CPU{
 	public final static byte JE = 		(byte) 110;
 	public final static byte STOP = 	(byte) 120;
 	public final static byte PRINT = 	(byte) 130;
-	public final static byte PRINTS = 	(byte) 140;
+	public final static byte PRINTI = 	(byte) 140;
 	public final static byte READ = 	(byte) 150;
-	public final static byte READS = 	(byte) 160;
-	public final static byte READI = 	(byte) 170;
-	public final static byte READSI = 	(byte) 180;
-	public final static byte SETR = 	(byte) 190;
+	public final static byte READI = 	(byte) 160;
+	public final static byte WRITE = 	(byte) 170;
+	public final static byte SETR = 	(byte) 180;
 	
 	public static byte USER = 			(byte) 0;
 	public static byte SUPERVISOR = 	(byte) 1;
 	
-	private byte MODE = SUPERVISOR; 	//Supervizoriaus rezimas - 1, vartotojo - 0.
+	private byte MODE = 	SUPERVISOR; 	//Supervizoriaus rezimas - 1, vartotojo - 0.
 	private byte SI = 		(byte) 0;
 	private byte TI = 		(byte) 50;
 	private byte PI = 		(byte) 0;
 	private byte PTR = 		(byte) 1;
 	private byte[] IC = 	{(byte) 0, (byte) 0};
 	private byte[] SP =	 	{(byte) 0, (byte) 0};
-	private byte[] CDR =	{(byte) 0, (byte) 0, (byte) 0};
+	private byte[] CDR =	{(byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0};
 	private byte[] R = 		{(byte) 0, (byte) 0};
 	private byte CF = 		(byte) 0;
 	
@@ -259,40 +258,50 @@ public class CPU{
 				}
 				
 				case STOP: {
-					System.out.println("STOP (QUITS PROGRAM)");
+					System.out.println("STOP");
+					modeToSupervisor();
 					SI = 7;
-					System.exit(0);
-					//this.IC = iterateRegister(this.IC, 1);
+					this.IC = iterateRegister(this.IC, 1);
 					break;
 				}
 				
 				case PRINT: {
+					modeToSupervisor();
 					SI = 1;
+					this.IC = iterateRegister(this.IC, 1);
+					callChannelDevice();
 					break;
 				}
 				
-				case PRINTS: {
+				case PRINTI: {
+					modeToSupervisor();
 					SI = 2;
+					this.IC = iterateRegister(this.IC, 1);
+					callChannelDevice();
 					break;
 				}
 				
 				case READ: {
+					modeToSupervisor();
 					SI = 3;
-					break;
-				}
-				
-				case READS: {
-					SI = 4;
+					this.IC = iterateRegister(this.IC, 1);
+					callChannelDevice();
 					break;
 				}
 				
 				case READI: {
-					SI = 5;
+					modeToSupervisor();
+					SI = 4;
+					this.IC = iterateRegister(this.IC, 1);
+					callChannelDevice();
 					break;
 				}
 				
-				case READSI: {
-					SI = 6;
+				case WRITE: {
+					modeToSupervisor();
+					SI = 5;
+					this.IC = iterateRegister(this.IC, 1);
+					callChannelDevice();
 					break;
 				}
 				
@@ -314,10 +323,46 @@ public class CPU{
 			}
 	}
 	
+	public void modeToSupervisor() {
+		MODE = 1;
+		TI = 50;
+		IC = iterateRegister(IC, 1);
+		byte[] ic_0 = {(byte) 11, (byte) (4*(PTR-1))};
+		byte[] ic_1 = {(byte) 11, (byte) (4*(PTR-1) + 1)};
+		byte[] sp_0 = {(byte) 11, (byte) (4*(PTR-1) + 2)};
+		byte[] sp_1 = {(byte) 11, (byte) (4*(PTR-1) + 3)};
+		mem.write(ic_0, IC[0]);
+		mem.write(ic_1, IC[1]);
+		mem.write(sp_0, SP[0]);
+		mem.write(sp_1, SP[1]);
+		
+		IC[0] = 0;
+		IC[1] = 0;
+		SP[0] = 12;
+		SP[1] = 0;
+	}
+
+	public void modeToUser() {
+		MODE = 0;
+		IC[0] = 0;
+		IC[1] = 0;
+		SP[0] = 12;
+		SP[1] = 0;
+
+	}
+	
+	public void callChannelDevice(){
+		CDR[0] = this.SI;
+		CDR[1] = R[0];
+		CDR[2] = R[1];
+		CDR[3] = R[2];
+		CDR[4] = R[3];
+		//Kvieciam CD irengini
+	}
+	
 	private void checkInterrupts(){
 		switch(SI){
 			case 1: {
-				
 				break;
 			}
 			
@@ -334,14 +379,6 @@ public class CPU{
 			}
 			
 			case 5: {
-				break;
-			}
-			
-			case 6: {
-				break;
-			}
-			
-			case 7: {
 				break;
 			}
 			
