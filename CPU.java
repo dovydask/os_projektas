@@ -35,7 +35,8 @@ public class CPU{
 	private byte CF = 		(byte) 0;
 	
 	private Memory mem;	//Bendroji atmintis! Irasymo/skaitymo operacijos vykdomos perduodant adresus siai klasei.
-	
+	protected Byte[][] ram;
+        
 	public CPU(){
 
     }
@@ -110,6 +111,11 @@ public class CPU{
 		return newReg;
 	}
 	
+        
+        public int hex(byte a) {
+		return Byte.toUnsignedInt(a);
+	}
+        
 	private byte[] addressConversion(byte[] address) {
 		if(MODE == 1){
 			return address.clone();
@@ -164,8 +170,31 @@ public class CPU{
 				}
 				
 				case ADD: {
+					                              byte[] tempSP = iterateAndConvert(SP, -3);
+                                        byte a = ram[hex(tempSP[0])][hex(tempSP[1])];
+                                        tempSP = iterateAndConvert(SP, -2);
+                                        byte b = ram[hex(tempSP[0])][hex(tempSP[1])];
+                                        tempSP = iterateAndConvert(SP, -1);
+                                        byte c = ram[hex(tempSP[0])][hex(tempSP[1])];
+                                        tempSP = iterateAndConvert(SP, 0);
+                                        byte d = ram[hex(tempSP[0])][hex(tempSP[1])];
+                                        short value1 = (short) (((a) << 8) | (b));
+                                        short value2 = (short) (((c) << 8) | (d));
+                                        short sum = (short) (value1 - value2);
+                                        byte a1 = (byte) sum;
+                                        byte a2 = (byte) (sum >> 8);
 
-					break;
+                                        tempSP = iterateAndConvert(SP, -1);
+                                        ram[hex(tempSP[0])][hex(tempSP[1])] = a1;
+                                        tempSP = iterateAndConvert(SP, -2);
+                                        ram[hex(tempSP[0])][hex(tempSP[1])] = a2;
+
+                                        tempSP = iterateRegister(this.SP, -1);
+                                        this.SP = tempSP;
+                                        this.IC = iterateRegister(this.IC, 1);
+                                        
+					                              break;
+				
 				}
 				
 				case SUB: {
@@ -382,4 +411,6 @@ public class CPU{
 	public void setSP(byte[] SP){
 		this.SP = SP;
 	}
+
 }
+
