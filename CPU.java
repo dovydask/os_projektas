@@ -20,48 +20,117 @@ public class CPU{
 	public final static byte READSI = 	(byte) 180;
 	public final static byte SETR = 	(byte) 190;
 	
-	public static int USER = 		0;
-	public static int SUPERVISOR = 	1;
+	public static byte USER = 			(byte) 0;
+	public static byte SUPERVISOR = 	(byte) 1;
 	
-	private int MODE; 	//Supervizoriaus režimas - 1, vartotojo - 0.
-	private int SI;
-	private int TI;
-	private int PI;
-	private int PTR;
-	private int IC;
-	private int SP;
-	public Byte[] CDR = { new Byte((byte) 0), new Byte((byte) 0), new Byte((byte) 0), new Byte((byte) 0),
-	new Byte((byte) 0) };
-	private int R;
-	private int CF;
+	private byte MODE = SUPERVISOR; 	//Supervizoriaus rezimas - 1, vartotojo - 0.
+	private byte SI = 		(byte) 0;
+	private byte TI = 		(byte) 50;
+	private byte PI = 		(byte) 0;
+	private byte PTR = 		(byte) 1;
+	private byte[] IC = 	{(byte) 0, (byte) 0};
+	private byte[] SP =	 	{(byte) 0, (byte) 0};
+	private byte[] CDR =	{(byte) 0, (byte) 0, (byte) 0};
+	private byte[] R = 		{(byte) 0, (byte) 0};
+	private byte CF = 		(byte) 0;
 	
-	private Memory mem;	//Bendroji atmintis! Žodži? ?rašymo/skaitymo operacijos vykdomos perduodant adresus šiai klasei.
+	private Memory mem;	//Bendroji atmintis! Irasymo/skaitymo operacijos vykdomos perduodant adresus siai klasei.
 	
 	public CPU(){
-		MODE = 	1;
-		SI = 	0;
-		TI = 	50;	//Taimerio skaitliukas. 50 laiko vienet? (ciklo iteracij?).
-		PI = 	0;
-		PTR = 	0;
-		IC = 	0;
-		SP = 	0;
-		//CDR =	0;
-		R = 	0;
-		CF = 	0;
+
     }
 	
 	public void setMemory(Memory mem){
 		this.mem = mem;
 	}
 	
-	public int getMode(){
+	public byte getMODE(){
 		return MODE;
 	}
 	
-	//Mašininis ciklas
+	public byte getSI(){
+		return SI;
+	}
+	
+	public byte getTI(){
+		return TI;
+	}
+	
+	public byte getPI(){
+		return PI;
+	}
+	
+	public byte getPTR(){
+		return PTR;
+	}
+	
+	public byte[] getIC(){
+		return IC;
+	}
+	
+	public byte[] getSP(){
+		return SP;
+	}
+	
+	public byte[] getCDR(){
+		return CDR;
+	}
+	
+	public byte[] getR(){
+		return R;
+	}
+	
+	public byte getCF(){
+		return CF;
+	}
+	
+	public int byteToInt(byte a) {
+		return Byte.toUnsignedInt(a);
+	}
+	
+	public byte[] iterateRegister(byte[] register, int amount) {
+		return iterateRegister(register, amount, getMODE());
+	}
+
+	public byte[] iterateRegister(byte[] register, int amount, byte mode) {
+		byte[] newReg = {register[0], register[1]};
+		int steps = Math.abs(amount);
+		for(int i=0; i<steps; i++){
+			if(amount > 0){
+				if(++newReg[1] == 0x00){
+					if(++newReg[0] == 0x10 && mode == 0){
+						newReg[0] = 0;
+					}
+				}
+			} 
+			else{
+				if(--newReg[1] == (byte) 0xFF){
+					if(--newReg[0] == (byte) 0xFF && mode == 0){
+						newReg[0] = 15;
+					}
+				}
+			}
+		}
+		return newReg;
+	}
+	
+	private byte[] addressConversion(byte[] address) {
+		if(MDR == 1){
+			return address.clone();
+		}
+		return Memory.pagingMechanism(address);
+	}
+
+	private byte[] iterateAndConvert(byte[] address, int amount) {
+		byte[] newAddress = iterateRegister(address, amount);
+		byte[] convertedAddress = addressConversion(newAddress);
+		return convertedAddress;
+	}
+	
+	//Masininis ciklas
 	public void cycle(){
 		try{
-			command(mem.read(IC));	//Skaitom komand? iš atminties žodžio, nurodyto IC.
+			command(mem.read(IC));	//Skaitom komanda is atminties zodzio, nurodyto IC.
 			checkInterrupts();
 			if(1 == 0){
 				throw new MemoryException();
@@ -69,92 +138,90 @@ public class CPU{
 		}
 		catch(MemoryException e){	
 			/*
-			TODO: Kažk? darom, kilus atminties išim?iai. Tikriausiai reiks nustatyti programinius
+			TODO: Kazka darom, kilus atminties isimciai. Tikriausiai reiks nustatyti programinius
 			pertraukimus (PI) - nepakanka atminties, neteisingas adresas ir pan.
 			*/
 		}
 		TI--;
 	}
 	
-	private void command(Word word){
-		IC++;
-		byte instruction = word.getByte(3);	//Instrukcijos kod? laikome paskutiniame žodžio baite.
-		word.setByte(3, (byte) 0);	//Užnulinam paskutin? žodžio bait?. Pirmuose 3-juose baituose užrašytas adresas.
+	private void command(byte instruction){
 		try{
 			switch(instruction){
 				case PUSH: {
 					System.out.println("PUSH");
-					SP++;
-					mem.write(mem.read(Word.wordToInt(word)), SP);
+					byte[] SP = addressConversion(this.SP);
+					byte[] temp = iterateAndConvert(this.IC, 1);
+					this.SP = iterateRegister(this.SP, 1);
+					mem.write(SP, mem.read(temp));
+					this.IC = iterateRegister(this.IC, 2);
 					break;
 				}
 				
 				case POP: {
-					mem.write(mem.read(SP), Word.wordToInt(word));
-					SP--;
+					byte[] SP = addressConversion(this.SP);
+					byte[] temp = iterateAndConvert(this.IC, 1);
+					mem.write(mem.read(temp), mem.read(temp));
+					this.SP = iterateRegister(this.SP, -1);
+					this.IC = iterateRegister(this.IC, 2);
 					break;
 				}
 				
 				case ADD: {
 					System.out.println("ADD");
-					mem.write(Word.intToWord(Word.wordToInt(mem.read(SP)) + Word.wordToInt(mem.read(SP-1))), SP-1);
 					SP--;
 					break;
 				}
 				
 				case SUB: {
-					mem.write(Word.intToWord(Word.wordToInt(mem.read(SP)) - Word.wordToInt(mem.read(SP-1))), SP-1);
 					SP--;
 					break;
 				}
 				
 				case MUL: {
-					mem.write(Word.intToWord(Word.wordToInt(mem.read(SP)) * Word.wordToInt(mem.read(SP-1))), SP-1);
 					SP--;
 					break;
 				}
 				
 				case DIV: {
-					mem.write(Word.intToWord(Word.wordToInt(mem.read(SP)) / Word.wordToInt(mem.read(SP-1))), SP-1);
 					SP--;
 					break;
 				}
 				
 				case CMP: {
-					if(Word.wordToInt(mem.read(SP-1)) == Word.wordToInt(mem.read(SP))){
+					if(){
 						CF = 0;
 					}
-					else if(Word.wordToInt(mem.read(SP-1)) < Word.wordToInt(mem.read(SP))){
+					else if(){
 						CF = 1;
 					}
-					else if(Word.wordToInt(mem.read(SP-1)) > Word.wordToInt(mem.read(SP))){
+					else if(){
 						CF = 2;
 					}
 					break;
 				}
 				
 				case JP: {
-					IC = Word.wordToInt(word);
 					break;
 				}
 				
 				case JG: {
 					if(CF == 1){
-						IC = Word.wordToInt(word);
+				
 					}
 					break;
 				}
 				
 				case JL: {
 					if(CF == 2){
-						IC = Word.wordToInt(word);
+						
 					}
 					break;
 				}
 				
 				case JE: {
 					if(CF == 0){
-						IC = Word.wordToInt(word);
+						
 					}
 					break;
 				}
@@ -196,7 +263,7 @@ public class CPU{
 				}
 				
 				case SETR: {
-					R = Word.wordToInt(word);
+
 					break;
 				}
 				
@@ -281,9 +348,5 @@ public class CPU{
 			System.out.println("TI = 0");
 			TI = 50;
 		}
-	}
-	
-	public int getTI(){
-		return TI;
 	}
 }
