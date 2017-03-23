@@ -13,8 +13,8 @@ public class RealMachine{
 		byte push = (byte) 10;
 		byte[] value1address = {(byte) 10, (byte) 5};
 		byte[] value2address = {(byte) 15, (byte) 10};
-		byte value1 = (byte) 5;
-		byte value2 = (byte) 6;
+		byte value1 = (byte) 100;
+		byte value2 = (byte) 1;
 		
 		memory.write(value1address, value1);
 		memory.write(value2address, value2);
@@ -31,13 +31,25 @@ public class RealMachine{
 		memory.write(address5, value2address[0]);
 		byte[] address6 = {(byte) 0, (byte) 5};
 		memory.write(address6, value2address[1]);
+		byte[] address7 = {(byte) 0, (byte) 6};
+		memory.write(address7, (byte) 70);
+		byte[] address8 = {(byte) 0, (byte) 7};
+		memory.write(address8, (byte) 100);
+		byte[] address9 = {(byte) 0, (byte) 8};
+		memory.write(address9, (byte) 200);
+		byte[] address10 = {(byte) 0, (byte) 9};
+		memory.write(address10, (byte) 0);
+		byte[] address11 = {(byte) 200, (byte) 0};
+		memory.write(address11, (byte) 120);
+		
 		
 		byte[] SP = {(byte) 15, (byte) 15};
+		
 		cpu.setSP(SP);
 		
 		cpu.setMemory(memory);
 		
-		while(cpu.getTI() != 48){
+		while(cpu.getTI() != 40){
 			cpu.cycle();
 		}
 		
@@ -52,12 +64,7 @@ public class RealMachine{
 		
 		byte pop = (byte) 20;
 		byte[] destination = {(byte) 256, (byte) 256};
-		byte[] address7 = {(byte) 0, (byte) 6};
-		memory.write(address7, pop);
-		byte[] address8 = {(byte) 0, (byte) 7};
-		memory.write(address8, destination[0]);
-		byte[] address9 = {(byte) 0, (byte) 8};
-		memory.write(address8, destination[1]);
+		
 		
 		cpu.setMemory(memory);
 		
