@@ -184,6 +184,7 @@ public class CPU{
 				}
 				
 				case CMP: {
+					System.out.println("STOP");
 					byte[] sp = addressConversion(this.SP);
 					byte x = mem.read(sp);
 					sp = iterateAndConvert(this.SP, -1);
@@ -198,6 +199,7 @@ public class CPU{
 					else if(x < y){
 						CF = 2;
 					}
+					this.IC = iterateRegister(this.IC, 1);
 					break;
 				}
 				
@@ -227,7 +229,7 @@ public class CPU{
 				}
 				
 				case JL: {
-					if(CF == 2){
+					if(CF == (byte) 2){
 						byte[] ic = iterateAndConvert(this.IC, 1);
 						byte x = mem.read(ic);
 						ic = iterateAndConvert(this.IC, 2);
@@ -257,7 +259,9 @@ public class CPU{
 				}
 				
 				case STOP: {
+					System.out.println("STOP");
 					SI = 7;
+					//this.IC = iterateRegister(this.IC, 1);
 					break;
 				}
 				
@@ -287,7 +291,6 @@ public class CPU{
 				}
 				
 				case READSI: {
-					System.out.println("READSI");
 					SI = 6;
 					break;
 				}
