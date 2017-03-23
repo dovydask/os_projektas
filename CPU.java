@@ -167,13 +167,17 @@ public class CPU{
 				
 				case ADD: {
 					byte[] tempSP = iterateAndConvert(SP, -3);
-                                        byte a = ram[(tempSP[0])][(tempSP[1])];
+                                        //byte a = ram[(tempSP[0])][(tempSP[1])];
+                                        byte a = mem.read(tempSP);
                                         tempSP = iterateAndConvert(SP, -2);
-                                        byte b = ram[(tempSP[0])][(tempSP[1])];
+                                        //byte b = ram[(tempSP[0])][(tempSP[1])];
+                                        byte b = mem.read(tempSP);
                                         tempSP = iterateAndConvert(SP, -1);
-                                        byte c = ram[(tempSP[0])][(tempSP[1])];
+                                        //byte c = ram[(tempSP[0])][(tempSP[1])];
+                                        byte c = mem.read(tempSP);
                                         tempSP = iterateAndConvert(SP, 0);
-                                        byte d = ram[(tempSP[0])][(tempSP[1])];
+                                        //byte d = ram[(tempSP[0])][(tempSP[1])];
+                                        byte d = mem.read(tempSP);
                                         short value1 = (short) (((a) << 8) | (b));
                                         short value2 = (short) (((c) << 8) | (d));
                                         short sum = (short) (value1 - value2);
@@ -181,10 +185,12 @@ public class CPU{
                                         byte a2 = (byte) (sum >> 8);
 
                                         tempSP = iterateAndConvert(SP, -2);
-                                        ram[(tempSP[0])][(tempSP[1])] = a1;
+                                        a1 = mem.read(tempSP);
+                                        //ram[(tempSP[0])][(tempSP[1])] = a1;
                                         tempSP = iterateAndConvert(SP, -3);
-                                        ram[(tempSP[0])][(tempSP[1])] = a2;
-                                        //byte[] a1a2 = {a1, a2};
+                                        a2 = mem.read(tempSP);
+                                        //ram[(tempSP[0])][(tempSP[1])] = a2;
+                                        ///byte[] a1a2 = {a1a2};
 
                                         tempSP = iterateRegister(this.SP, -2);
                                         
@@ -193,6 +199,7 @@ public class CPU{
                                         mem.write(SP, a2);
                                         
 					break;
+				
 				
 				}
 				
