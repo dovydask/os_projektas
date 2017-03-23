@@ -184,13 +184,13 @@ public class CPU{
                                         ram[(tempSP[0])][(tempSP[1])] = a1;
                                         tempSP = iterateAndConvert(SP, -3);
                                         ram[(tempSP[0])][(tempSP[1])] = a2;
-                                        byte[] a1a2 = {a1, a2};
+                                        //byte[] a1a2 = {a1, a2};
 
                                         tempSP = iterateRegister(this.SP, -2);
                                         
                                         this.SP = tempSP;
                                         this.IC = iterateRegister(this.IC, 1);
-                                        mem.write(SP, a1a2);
+                                        mem.write(SP, a2);
                                         
 					break;
 				
