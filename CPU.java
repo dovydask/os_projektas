@@ -84,10 +84,6 @@ public class CPU{
 		return CF;
 	}
 	
-	public int byteToInt(byte a) {
-		return Byte.toUnsignedInt(a);
-	}
-	
 	public byte[] iterateRegister(byte[] register, int amount) {
 		return iterateRegister(register, amount, getMODE());
 	}
@@ -115,10 +111,10 @@ public class CPU{
 	}
 	
 	private byte[] addressConversion(byte[] address) {
-		if(MDR == 1){
+		if(MODE == 1){
 			return address.clone();
 		}
-		return Memory.pagingMechanism(address);
+		return mem.pagingMechanism(address, this.PTR);
 	}
 
 	private byte[] iterateAndConvert(byte[] address, int amount) {
@@ -129,99 +125,133 @@ public class CPU{
 	
 	//Masininis ciklas
 	public void cycle(){
-		try{
-			command(mem.read(IC));	//Skaitom komanda is atminties zodzio, nurodyto IC.
-			checkInterrupts();
-			if(1 == 0){
-				throw new MemoryException();
-			}
-		}
-		catch(MemoryException e){	
-			/*
-			TODO: Kazka darom, kilus atminties isimciai. Tikriausiai reiks nustatyti programinius
-			pertraukimus (PI) - nepakanka atminties, neteisingas adresas ir pan.
-			*/
-		}
+		command(mem.read(IC));	//Skaitom komanda is atminties zodzio, nurodyto IC.
+		checkInterrupts();
 		TI--;
 	}
 	
 	private void command(byte instruction){
-		try{
 			switch(instruction){
 				case PUSH: {
 					System.out.println("PUSH");
 					byte[] SP = addressConversion(this.SP);
 					byte[] temp = iterateAndConvert(this.IC, 1);
+					byte x = mem.read(temp);
+					temp = iterateAndConvert(this.IC, 2);
+					byte y = mem.read(temp);
+					byte[] xy = {x, y};
+					xy = addressConversion(xy);
+					SP = iterateRegister(SP, 1);
+					mem.write(xy, SP);
 					this.SP = iterateRegister(this.SP, 1);
-					mem.write(SP, mem.read(temp));
-					this.IC = iterateRegister(this.IC, 2);
+					this.IC = iterateRegister(this.IC, 3);
 					break;
 				}
 				
 				case POP: {
-					byte[] SP = addressConversion(this.SP);
-					byte[] temp = iterateAndConvert(this.IC, 1);
-					mem.write(mem.read(temp), mem.read(temp));
+					System.out.println("POP");
+					byte[] sp = addressConversion(this.SP);
+					byte[] ic = iterateAndConvert(this.IC, 1);
+					byte x = mem.read(ic);
+					ic = iterateAndConvert(this.IC, 2);
+					byte y = mem.read(ic);
+					byte[] xy = {x, y};
+					xy = addressConversion(xy);
+					mem.write(sp, xy);
 					this.SP = iterateRegister(this.SP, -1);
-					this.IC = iterateRegister(this.IC, 2);
+					this.IC = iterateRegister(this.IC, 3);
 					break;
 				}
 				
 				case ADD: {
-					System.out.println("ADD");
-					SP--;
+
 					break;
 				}
 				
 				case SUB: {
-					SP--;
+
 					break;
 				}
 				
 				case MUL: {
-					SP--;
+
 					break;
 				}
 				
 				case DIV: {
-					SP--;
+
 					break;
 				}
 				
 				case CMP: {
-					if(){
+					byte[] sp = addressConversion(this.SP);
+					byte x = mem.read(sp);
+					sp = iterateAndConvert(this.SP, -1);
+					byte y = mem.read(sp);
+	
+					if(x == y){
 						CF = 0;
 					}
-					else if(){
+					else if(x > y){
 						CF = 1;
 					}
-					else if(){
+					else if(x < y){
 						CF = 2;
 					}
 					break;
 				}
 				
 				case JP: {
+					byte[] ic = iterateAndConvert(this.IC, 1);
+					byte x = mem.read(ic);
+					ic = iterateAndConvert(this.IC, 2);
+					byte y = mem.read(ic);
+					byte[] xy = {x, y};
+					this.IC = xy;
 					break;
 				}
 				
 				case JG: {
 					if(CF == 1){
-				
+						byte[] ic = iterateAndConvert(this.IC, 1);
+						byte x = mem.read(ic);
+						ic = iterateAndConvert(this.IC, 2);
+						byte y = mem.read(ic);
+						byte[] xy = {x, y};
+						this.IC = xy;
+					}
+					else{
+						this.IC = iterateRegister(this.IC, 3);
 					}
 					break;
 				}
 				
 				case JL: {
 					if(CF == 2){
-						
+						byte[] ic = iterateAndConvert(this.IC, 1);
+						byte x = mem.read(ic);
+						ic = iterateAndConvert(this.IC, 2);
+						byte y = mem.read(ic);
+						byte[] xy = {x, y};
+						this.IC = xy;
+					}
+					else{
+						this.IC = iterateRegister(this.IC, 3);
 					}
 					break;
 				}
 				
 				case JE: {
 					if(CF == 0){
-						
+						byte[] ic = iterateAndConvert(this.IC, 1);
+						byte x = mem.read(ic);
+						ic = iterateAndConvert(this.IC, 2);
+						byte y = mem.read(ic);
+						byte[] xy = {x, y};
+						this.IC = xy;
+					}
+					else{
+						this.IC = iterateRegister(this.IC, 3);
 					}
 					break;
 				}
@@ -263,7 +293,13 @@ public class CPU{
 				}
 				
 				case SETR: {
-
+					byte[] ic = iterateAndConvert(this.IC, 1);
+					byte x = mem.read(ic);
+					ic = iterateAndConvert(this.IC, 2);
+					byte y = mem.read(ic);
+					byte[] xy = {x, y};
+					this.R = xy;
+					this.IC = iterateRegister(this.IC, 3);
 					break;
 				}
 				
@@ -272,13 +308,6 @@ public class CPU{
 					break;
 				}
 			}
-			if(1 == 0){
-				throw new MemoryException();
-			}
-		}
-		catch(MemoryException e){
-			//TODO
-		}	
 	}
 	
 	private void checkInterrupts(){
@@ -348,5 +377,9 @@ public class CPU{
 			System.out.println("TI = 0");
 			TI = 50;
 		}
+	}
+	
+	public void setSP(byte[] SP){
+		this.SP = SP;
 	}
 }

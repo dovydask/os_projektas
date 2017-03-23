@@ -2,49 +2,73 @@ public class RealMachine{
 	
 	CPU cpu;
 	Memory memory;
-	ChannelDevice channeldevice;
 	
 	public RealMachine(){
 		cpu = new CPU();
-		memory = new Memory(30720);
-		channeldevice = new ChannelDevice();
+		memory = new Memory(256, 256);
 	}
 	
 	public void operate(){
-		Word test1 = new Word(); //push
-		Word test2 = new Word(); //add
-		Word test3 = new Word(); //readsi
-		Word test4 = new Word();
-		Word test5 = new Word();
-		Word test6 = new Word();
 		
-		test4.setByte(0, (byte) 5);
-		memory.write(test4, 15);
-		test5.setByte(0, (byte) 4);
-		memory.write(test5, 16);
+		byte push = (byte) 10;
+		byte[] value1address = {(byte) 10, (byte) 5};
+		byte[] value2address = {(byte) 15, (byte) 10};
+		byte value1 = (byte) 5;
+		byte value2 = (byte) 6;
 		
-		test1.setByte(3, (byte) 10);
-		test1.setByte(0, (byte) 15);
+		memory.write(value1address, value1);
+		memory.write(value2address, value2);
 		
-		test6.setByte(3, (byte) 10);
-		test6.setByte(0, (byte) 16);
+		byte[] address1 = {(byte) 0, (byte) 0};
+		memory.write(address1, push);
+		byte[] address2 = {(byte) 0, (byte) 1};
+		memory.write(address2, value1address[0]);
+		byte[] address3 = {(byte) 0, (byte) 2};
+		memory.write(address3, value1address[1]);
+		byte[] address4 = {(byte) 0, (byte) 3};
+		memory.write(address4, push);
+		byte[] address5 = {(byte) 0, (byte) 4};
+		memory.write(address5, value2address[0]);
+		byte[] address6 = {(byte) 0, (byte) 5};
+		memory.write(address6, value2address[1]);
 		
-		test2.setByte(3, (byte) 30);
-		
-		
-		memory.write(test1, 5);
-		memory.write(test6, 6);
-		memory.write(test2, 7);
+		byte[] SP = {(byte) 15, (byte) 15};
+		cpu.setSP(SP);
 		
 		cpu.setMemory(memory);
 		
-		while(cpu.getTI() != 0){ //pratestavimui, pirmi 50 atminties blokai
+		while(cpu.getTI() != 48){
 			cpu.cycle();
 		}
 		
-		System.out.println(Word.wordToInt(memory.read(0)));
-		System.out.println(Word.wordToInt(memory.read(1)));
-		System.out.println(Word.wordToInt(memory.read(2)));
-		System.out.println(Word.wordToInt(memory.read(3)));
+		byte[] SP1 = {(byte) 15, (byte) 16};
+		byte[] SP2 = {(byte) 15, (byte) 17};
+		byte[] SP3 = {(byte) 15, (byte) 18};
+		
+		System.out.println(memory.read(SP));
+		System.out.println(memory.read(SP1));
+		System.out.println(memory.read(SP2));
+		System.out.println(memory.read(SP3));
+		
+		byte pop = (byte) 20;
+		byte[] destination = {(byte) 256, (byte) 256};
+		byte[] address7 = {(byte) 0, (byte) 6};
+		memory.write(address7, pop);
+		byte[] address8 = {(byte) 0, (byte) 7};
+		memory.write(address8, destination[0]);
+		byte[] address9 = {(byte) 0, (byte) 8};
+		memory.write(address8, destination[1]);
+		
+		cpu.setMemory(memory);
+		
+		while(cpu.getTI() != 0){
+			cpu.cycle();
+		}
+		System.out.println("---");
+		System.out.println(memory.read(destination));
+		//System.out.println(memory.read({(byte) 15, (byte) 16}));
+		//System.out.println(memory.read({(byte) 15, (byte) 17}));
+		//System.out.println(memory.read({(byte) 15, (byte) 18}));
+		//System.out.println(memory.read({(byte) 15, (byte) 19}));
 	}
 }
