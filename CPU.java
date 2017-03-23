@@ -112,10 +112,6 @@ public class CPU{
 	}
 	
         
-        public int hex(byte a) {
-		return Byte.toUnsignedInt(a);
-	}
-        
 	private byte[] addressConversion(byte[] address) {
 		if(MODE == 1){
 			return address.clone();
@@ -170,30 +166,33 @@ public class CPU{
 				}
 				
 				case ADD: {
-					                              byte[] tempSP = iterateAndConvert(SP, -3);
-                                        byte a = ram[hex(tempSP[0])][hex(tempSP[1])];
+					byte[] tempSP = iterateAndConvert(SP, -3);
+                                        byte a = ram[(tempSP[0])][(tempSP[1])];
                                         tempSP = iterateAndConvert(SP, -2);
-                                        byte b = ram[hex(tempSP[0])][hex(tempSP[1])];
+                                        byte b = ram[(tempSP[0])][(tempSP[1])];
                                         tempSP = iterateAndConvert(SP, -1);
-                                        byte c = ram[hex(tempSP[0])][hex(tempSP[1])];
+                                        byte c = ram[(tempSP[0])][(tempSP[1])];
                                         tempSP = iterateAndConvert(SP, 0);
-                                        byte d = ram[hex(tempSP[0])][hex(tempSP[1])];
+                                        byte d = ram[(tempSP[0])][(tempSP[1])];
                                         short value1 = (short) (((a) << 8) | (b));
                                         short value2 = (short) (((c) << 8) | (d));
                                         short sum = (short) (value1 - value2);
                                         byte a1 = (byte) sum;
                                         byte a2 = (byte) (sum >> 8);
 
-                                        tempSP = iterateAndConvert(SP, -1);
-                                        ram[hex(tempSP[0])][hex(tempSP[1])] = a1;
                                         tempSP = iterateAndConvert(SP, -2);
-                                        ram[hex(tempSP[0])][hex(tempSP[1])] = a2;
+                                        ram[(tempSP[0])][(tempSP[1])] = a1;
+                                        tempSP = iterateAndConvert(SP, -3);
+                                        ram[(tempSP[0])][(tempSP[1])] = a2;
+                                        byte[] a1a2 = {a1, a2};
 
-                                        tempSP = iterateRegister(this.SP, -1);
+                                        tempSP = iterateRegister(this.SP, -2);
+                                        
                                         this.SP = tempSP;
                                         this.IC = iterateRegister(this.IC, 1);
+                                        mem.write(SP, a1a2);
                                         
-					                              break;
+					break;
 				
 				}
 				
