@@ -35,7 +35,7 @@ public class CPU{
 	private byte CF = 		(byte) 0;
 	
 	private Memory mem;	//Bendroji atmintis! Irasymo/skaitymo operacijos vykdomos perduodant adresus siai klasei.
-	protected Byte[][] ram;
+	//protected Byte[][] ram;
         
 	public CPU(){
 
