@@ -170,8 +170,7 @@ public class CPU{
 				}
 				
 				case ADD: {
-
-					byte[] tempSP = iterateAndConvert(SP, -3);
+					                              byte[] tempSP = iterateAndConvert(SP, -3);
                                         byte a = ram[hex(tempSP[0])][hex(tempSP[1])];
                                         tempSP = iterateAndConvert(SP, -2);
                                         byte b = ram[hex(tempSP[0])][hex(tempSP[1])];
@@ -194,7 +193,7 @@ public class CPU{
                                         this.SP = tempSP;
                                         this.IC = iterateRegister(this.IC, 1);
                                         
-					break;
+					                              break;
 				
 				}
 				
@@ -412,4 +411,6 @@ public class CPU{
 	public void setSP(byte[] SP){
 		this.SP = SP;
 	}
+
 }
+
