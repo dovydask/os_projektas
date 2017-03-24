@@ -16,8 +16,7 @@ public class CPU{
 	public final static byte PRINTI = 	(byte) 140;
 	public final static byte READ = 	(byte) 150;
 	public final static byte READI = 	(byte) 160;
-	public final static byte WRITE = 	(byte) 170;
-	public final static byte SETR = 	(byte) 180;
+	public final static byte SETR = 	(byte) 170;
 	
 	public static byte USER = 			(byte) 0;
 	public static byte SUPERVISOR = 	(byte) 1;
@@ -30,18 +29,22 @@ public class CPU{
 	private byte[] IC = 	{(byte) 0, (byte) 0};
 	private byte[] SP =	 	{(byte) 0, (byte) 0};
 	private byte[] CDR =	{(byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0};
-	private byte[] R = 		{(byte) 0, (byte) 0};
+	private byte[] R = 		{(byte) 0, (byte) 0, (byte) 0, (byte) 0};
 	private byte CF = 		(byte) 0;
 	
 	private Memory mem;	//Bendroji atmintis! Irasymo/skaitymo operacijos vykdomos perduodant adresus siai klasei.
-	//protected Byte[][] ram;
-        
+	private ChannelDevice channeldevice;
+
 	public CPU(){
 
     }
 	
 	public void setMemory(Memory mem){
 		this.mem = mem;
+	}
+	
+	public void setChannelDevice(ChannelDevice channeldevice){
+		this.channeldevice = channeldevice;
 	}
 	
 	public byte getMODE(){
@@ -366,7 +369,8 @@ public class CPU{
 				}
 				
 				case PRINT: {
-					modeToSupervisor();
+					//modeToSupervisor();
+					System.out.println("PRINT");
 					SI = 1;
 					this.IC = iterateRegister(this.IC, 1);
 					callChannelDevice();
@@ -374,7 +378,8 @@ public class CPU{
 				}
 				
 				case PRINTI: {
-					modeToSupervisor();
+					//modeToSupervisor();
+					System.out.println("PRINTI");
 					SI = 2;
 					this.IC = iterateRegister(this.IC, 1);
 					callChannelDevice();
@@ -382,7 +387,8 @@ public class CPU{
 				}
 				
 				case READ: {
-					modeToSupervisor();
+					//modeToSupervisor();
+					System.out.println("READ");
 					SI = 3;
 					this.IC = iterateRegister(this.IC, 1);
 					callChannelDevice();
@@ -390,16 +396,9 @@ public class CPU{
 				}
 				
 				case READI: {
-					modeToSupervisor();
+					//modeToSupervisor();
+					System.out.println("READI");
 					SI = 4;
-					this.IC = iterateRegister(this.IC, 1);
-					callChannelDevice();
-					break;
-				}
-				
-				case WRITE: {
-					modeToSupervisor();
-					SI = 5;
 					this.IC = iterateRegister(this.IC, 1);
 					callChannelDevice();
 					break;
@@ -407,12 +406,16 @@ public class CPU{
 				
 				case SETR: {
 					byte[] ic = iterateAndConvert(this.IC, 1);
-					byte x = mem.read(ic);
+					byte x1 = mem.read(ic);
 					ic = iterateAndConvert(this.IC, 2);
-					byte y = mem.read(ic);
-					byte[] xy = {x, y};
+					byte y1 = mem.read(ic);
+					ic = iterateAndConvert(this.IC, 3);
+					byte x2 = mem.read(ic);
+					ic = iterateAndConvert(this.IC, 4);
+					byte y2 = mem.read(ic);
+					byte[] xy = {x1, y1, x2, y2};
 					this.R = xy;
-					this.IC = iterateRegister(this.IC, 3);
+					this.IC = iterateRegister(this.IC, 5);
 					break;
 				}
 				
@@ -457,7 +460,8 @@ public class CPU{
 		CDR[2] = R[1];
 		CDR[3] = R[2];
 		CDR[4] = R[3];
-		//Kvieciam CD irengini
+		channeldevice.setMemory(this.mem);
+		channeldevice.command(CDR);
 	}
 	
 	private void checkInterrupts(){
@@ -475,10 +479,6 @@ public class CPU{
 			}
 			
 			case 4: {
-				break;
-			}
-			
-			case 5: {
 				break;
 			}
 			
