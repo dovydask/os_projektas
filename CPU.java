@@ -87,6 +87,47 @@ public class CPU{
 		return CF;
 	}
 	
+	public Memory getMemory(){
+		return mem;
+	}
+	
+	public void setMODE(byte MODE){
+		this.MODE = MODE;
+	}
+	
+	public void setPTR(byte PTR){
+		this.PTR = PTR;
+	}
+	
+	public void setPI(byte PI){
+		this.PI = PI;
+	}
+	
+	public void setSI(byte SI){
+		this.SI = SI;
+	}
+	
+	public void setTI(byte TI){
+		this.TI = TI;
+	}
+	
+	public void setCF(byte CF){
+		this.CF = CF;
+	}
+	
+	public void setIC(byte[] IC){
+		this.IC = IC;
+	}
+	
+	public void setR(byte[] R){
+		this.R = R;
+	}
+	
+	public void setCDR(byte[] CDR){
+		this.CDR = CDR;
+	}
+	
+	
 	public byte[] iterateRegister(byte[] register, int amount) {
 		return iterateRegister(register, amount, getMODE());
 	}
@@ -129,9 +170,15 @@ public class CPU{
 	
 	//Masininis ciklas
 	public void cycle(){
-		command(mem.read(IC));	//Skaitom komanda is atminties zodzio, nurodyto IC.
-		checkInterrupts();
-		TI--;
+		while(TI != 0){
+			command(mem.read(IC));	//Skaitom komanda is atminties zodzio, nurodyto IC.
+			checkInterrupts();
+			TI--;
+		}
+	}
+	
+	public void resetTI(){
+		TI = 50;
 	}
 	
 	private void command(byte instruction){
