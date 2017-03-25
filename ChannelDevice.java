@@ -9,9 +9,9 @@ public class ChannelDevice{
 	private final static byte READ = 	3;
 	private final static byte READI = 	4;
 	
-    CPU cpu;
-    Memory memory;
-	Memory externalMemory = new Memory(512, 256);
+    public CPU cpu;
+    public Memory memory;
+	public Memory externalMemory = new Memory(512, 256);
     private byte[] lastCDR;
     private LinkedList<String> inputQueue = new LinkedList<String>();
     private boolean waitingForInput = false;

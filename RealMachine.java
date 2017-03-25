@@ -1,8 +1,22 @@
+import java.awt.Component;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
+
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ScrollPaneConstants;
+
+import javax.swing.table.TableModel;
+import javax.swing.table.TableColumnModel;
+
+
 public class RealMachine{
 	
-	CPU cpu;
-	Memory memory;
-	ChannelDevice channeldevice;
+	public CPU cpu;
+	public Memory memory;
+	public ChannelDevice channeldevice;
+	public JFrame frame;
 	
 	public RealMachine(){
 		cpu = new CPU();
@@ -10,6 +24,8 @@ public class RealMachine{
 		channeldevice = new ChannelDevice();
 		channeldevice.setCPU(cpu);
 		cpu.setChannelDevice(channeldevice);
+		cpu.setMemory(memory);
+		create_HDD_GUI();
 	}
 	
 	public void operate(){
@@ -105,5 +121,42 @@ public class RealMachine{
 		//System.out.println(memory.read({(byte) 15, (byte) 17}));
 		//System.out.println(memory.read({(byte) 15, (byte) 18}));
 		//System.out.println(memory.read({(byte) 15, (byte) 19}));
+	}
+	
+	private void create_HDD_GUI() {
+		frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setBounds(150 + 800, 150, 640, 480);
+		frame.setTitle("External Memory (HDD)");
+
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		frame.setContentPane(scrollPane);
+
+		JTable HDDtable = new JTable();
+		HDDtable.setAlignmentY(Component.TOP_ALIGNMENT);
+		HDDtable.setAlignmentX(Component.LEFT_ALIGNMENT);
+		HDDtable.setRowSelectionAllowed(false);
+		HDDtable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		scrollPane.setViewportView(HDDtable);
+
+		JTable rowTable = new RowNumberTable(HDDtable);
+		scrollPane.setRowHeaderView(rowTable);
+		scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
+
+		HDDtable.setModel(new CustomTable(channeldevice.externalMemory.getMemory()));
+
+		resizeColumnWidth(HDDtable);
+	}
+	
+	
+	public static void resizeColumnWidth(JTable table) {
+		final TableColumnModel columnModel = table.getColumnModel();
+		for (int column = 0; column < table.getColumnCount(); column++) {
+			columnModel.getColumn(column).setMinWidth(25);
+			columnModel.getColumn(column).setMaxWidth(25);
+			columnModel.getColumn(column).setWidth(25);
+		}
 	}
 }
