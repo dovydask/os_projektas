@@ -25,6 +25,8 @@ public class RealMachine{
 		channeldevice.setCPU(cpu);
 		cpu.setChannelDevice(channeldevice);
 		cpu.setMemory(memory);
+		cpu.resetCPU();
+		cpu.resetCPU();
 		create_HDD_GUI();
 	}
 	
