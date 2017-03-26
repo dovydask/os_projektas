@@ -165,6 +165,9 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				Interface.cpu.resetTI();
 				Interface.cpu.cycle();
+				printDataToOutput(Interface.channeldevice.lastOutput);
+				repaint();
+				refreshData();
 			}
 		});
 		contentPane.add(btnRunSingleCycle, "wrap");

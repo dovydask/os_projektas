@@ -15,6 +15,7 @@ public class ChannelDevice{
     private byte[] lastCDR;
     private LinkedList<String> inputQueue = new LinkedList<String>();
     private boolean waitingForInput = false;
+	public String lastOutput = "";
         
     public ChannelDevice(){
 		
@@ -43,7 +44,7 @@ public class ChannelDevice{
 						break;
 					out += add;
 				}
-				System.out.println(out);
+				this.lastOutput = out;
 				break;	
 			}
 			
