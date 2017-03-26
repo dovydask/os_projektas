@@ -11,7 +11,7 @@ public class ChannelDevice{
 	
     public CPU cpu;
     public Memory memory;
-	public Memory externalMemory = new Memory(512, 256);
+	public Memory externalMemory = new Memory(256, 256);
     private byte[] lastCDR;
     private LinkedList<String> inputQueue = new LinkedList<String>();
     private boolean waitingForInput = false;
@@ -53,8 +53,8 @@ public class ChannelDevice{
 				byte[] addressMem = {lastCDR[1], lastCDR[2]};
 				byte[] addressExt = {lastCDR[3], lastCDR[4]};
 				while(i++ < 100){
-					byte b = memory.read(addressExt);
-					if(b == (byte) 0x62)
+					byte b = externalMemory.read(addressExt);
+					if(b == (byte) 0x58)
 						break;
 					memory.write(addressMem, b);
 					addressMem = cpu.iterateRegister(addressMem, 1, (byte) 1);
@@ -90,14 +90,35 @@ public class ChannelDevice{
 				byte[] addressExt = {lastCDR[3], lastCDR[4]};
 				while(i++ < 100){
 					byte b = memory.read(addressMem);
-					if (b == (byte) 0x62)
+					if (b == (byte) 0x58)
 						break;
-					memory.write(addressExt, b);
+					externalMemory.write(addressExt, b);
 					addressMem = cpu.iterateRegister(addressMem, 1, (byte) 1);
 					addressExt = cpu.iterateRegister(addressExt, 1, (byte) 1);
 				}
 				break;
 			}
+			
+			case 5: {
+				if(!inputQueue.isEmpty()){
+					String s = inputQueue.removeFirst();
+					byte[] bytes = s.getBytes(StandardCharsets.US_ASCII);
+					byte[] address = {lastCDR[1], lastCDR[2]};
+					int i = 0;
+					for(byte b : bytes){
+						memory.write(address, b);
+						address = cpu.iterateRegister(address, 1, (byte) 1);
+						if(++i == 100)
+							break;
+					}
+					//cpu.PI = (byte) 6;
+					//MissingLink.frame.refreshData();
+				}
+				else
+					waitingForInput = true;
+				break;
+			}
+			
 			
 			default: {
 				break;

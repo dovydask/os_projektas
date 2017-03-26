@@ -163,14 +163,23 @@ public class GUI extends JFrame {
 		JButton btnRunSingleCycle = new JButton("Begin Cycle");
 		btnRunSingleCycle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Interface.cpu.resetTI();
 				Interface.cpu.cycle();
 				printDataToOutput(Interface.channeldevice.lastOutput);
 				repaint();
 				refreshData();
 			}
 		});
-		contentPane.add(btnRunSingleCycle, "wrap");
+		contentPane.add(btnRunSingleCycle);
+		
+		JButton btnReset = new JButton("Reset");
+		btnReset.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Interface.cpu.resetCPU();
+				repaint();
+				refreshData();
+			}
+		});
+		contentPane.add(btnReset, "wrap");
 
 		inputPanel = new IOWindow(true);
 		inputPanel.setMinimumSize(new Dimension(750, 75));

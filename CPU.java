@@ -27,12 +27,12 @@ public class CPU{
 	private byte PI = 		(byte) 0;
 	private byte PTR = 		(byte) 1;
 	private byte[] IC = 	{(byte) 0, (byte) 0};
-	private byte[] SP =	 	{(byte) 0, (byte) 0};
+	private byte[] SP =	 	{(byte) 12, (byte) 0};
 	private byte[] CDR =	{(byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0};
 	private byte[] R = 		{(byte) 0, (byte) 0, (byte) 0, (byte) 0};
 	private byte CF = 		(byte) 0;
 	
-	private Memory mem;	//Bendroji atmintis! Irasymo/skaitymo operacijos vykdomos perduodant adresus siai klasei.
+	private Memory mem;
 	private ChannelDevice channeldevice;
 
 	public CPU(){
@@ -170,8 +170,18 @@ public class CPU{
 	
 	//Masininis ciklas
 	public void cycle(){
+		
+		if(TI == 0){
+			modeToSupervisor();
+		}
 		while(TI != 0){
-			command(mem.read(IC));	//Skaitom komanda is atminties zodzio, nurodyto IC.
+			if(MODE == SUPERVISOR){
+				command(mem.read(IC));
+			}
+			else{
+				//IC = mem.pagingMechanism(IC, PTR);
+				command(mem.read(IC));
+			}
 			checkInterrupts();
 			TI--;
 		}
@@ -181,17 +191,43 @@ public class CPU{
 		TI = 50;
 	}
 	
+	public void resetCPU(){
+		TI = 50;
+		IC[0] = (byte) 0;
+		IC[1] = (byte) 0;
+		IC = addressConversion(IC);
+		PTR = (byte) 1;
+		R[0] = (byte) 0;
+		R[1] = (byte) 0;
+		R[2] = (byte) 0;
+		R[3] = (byte) 0;
+		CDR[0] = (byte) 0;
+		CDR[1] = (byte) 0;
+		CDR[2] = (byte) 0;
+		CDR[3] = (byte) 0;
+		CDR[4] = (byte) 0;
+		SP[0] = 12;
+		SP[1] = 0;
+		SP = addressConversion(SP);
+		SI = (byte) 0;
+		PI = (byte) 0;
+		CF = (byte) 0;
+		MODE = USER;
+	}
+	
 	private void command(byte instruction){
 			switch(instruction){
 				case PUSH: {
 					System.out.println("PUSH");
-					byte[] sp = addressConversion(this.SP);
-					byte[] temp = iterateAndConvert(this.IC, 1);
+					byte[] sp = this.SP;
+					byte[] temp = iterateRegister(this.IC, 1);
 					byte x = mem.read(temp);
-					temp = iterateAndConvert(this.IC, 2);
+					temp = iterateRegister(this.IC, 2);
 					byte y = mem.read(temp);
 					byte[] xy = {x, y};
-					xy = addressConversion(xy);
+					System.out.println(mem.read(xy));
+					//xy = addressConversion(xy);
+					System.out.println(mem.read(xy));
 					sp = iterateRegister(sp, 1);
 					mem.write(xy, SP);
 					this.SP = iterateRegister(this.SP, 1);
@@ -201,13 +237,13 @@ public class CPU{
 				
 				case POP: {
 					System.out.println("POP");
-					byte[] sp = addressConversion(this.SP);
-					byte[] ic = iterateAndConvert(this.IC, 1);
+					byte[] sp = this.SP;
+					byte[] ic = iterateRegister(this.IC, 1);
 					byte x = mem.read(ic);
-					ic = iterateAndConvert(this.IC, 2);
+					ic = iterateRegister(this.IC, 2);
 					byte y = mem.read(ic);
 					byte[] xy = {x, y};
-					xy = addressConversion(xy);
+					//xy = addressConversion(xy);
 					mem.write(sp, xy);
 					this.SP = iterateRegister(this.SP, -1);
 					this.IC = iterateRegister(this.IC, 3);
@@ -215,31 +251,36 @@ public class CPU{
 				}
 				
 				case ADD: {
-                                        byte[] tempSP = iterateAndConvert(SP, -3);
-                                        byte a = mem.read(tempSP);
-                                        tempSP = iterateAndConvert(SP, -2);
-                                        byte b = mem.read(tempSP);
-                                        tempSP = iterateAndConvert(SP, -1);
-                                        byte c = mem.read(tempSP);
-                                        tempSP = iterateAndConvert(SP, 0);
-                                        byte d = mem.read(tempSP);
+					System.out.println("Add");
+                    byte[] tempSP = iterateRegister(SP, -4);
+                    byte a = mem.read(tempSP);
+                    tempSP = iterateRegister(SP, -3);
+                    byte b = mem.read(tempSP);
+                    tempSP = iterateRegister(SP, -2);
+                    byte c = mem.read(tempSP);
+                    tempSP = iterateRegister(SP, -1);
+                    byte d = mem.read(tempSP);
 					
+					System.out.println("A: "+ a);
+					System.out.println("B: "+ b);
+					System.out.println("C: "+ c);
+					System.out.println("D: "+ d);
 					
-                                        short value1 = (short) (((a) << 8) | (b));
-                                        short value2 = (short) (((c) << 8) | (d));
-                                        short sum = (short) (value1 + value2);
-                                        byte a1 = (byte) sum;
-                                        byte a2 = (byte) (sum >> 8);
+                    short value1 = (short) (((a) << 8) | (b));
+                    short value2 = (short) (((c) << 8) | (d));
+                    short sum = (short) (value1 + value2);
+                    byte a1 = (byte) sum;
+                    byte a2 = (byte) (sum >> 8);
 
-                                        tempSP = iterateAndConvert(SP, -2);
-                                        mem.write(tempSP, a1);
-                                        tempSP = iterateAndConvert(SP, -3);
-                                        mem.write(tempSP, a2);
+                    tempSP = iterateRegister(SP, -2);
+                    mem.write(tempSP, a1);
+                    tempSP = iterateRegister(SP, -3);
+                    mem.write(tempSP, a2);
 
-                                        tempSP = iterateRegister(this.SP, -2);
+                    tempSP = iterateRegister(this.SP, -2);
                                         
-                                        this.SP = tempSP;
-                                        this.IC = iterateRegister(this.IC, 1);
+                    this.SP = tempSP;
+                    this.IC = iterateRegister(this.IC, 1);
                    
 					break;
 				
@@ -248,95 +289,95 @@ public class CPU{
 				
 				case SUB: {
 
-                                        byte[] tempSP = iterateAndConvert(SP, -3);
-                                        byte a = mem.read(tempSP);
-                                        tempSP = iterateAndConvert(SP, -2);
-                                        byte b = mem.read(tempSP);
-                                        tempSP = iterateAndConvert(SP, -1);
-                                        byte c = mem.read(tempSP);
-                                        tempSP = iterateAndConvert(SP, 0);
-                                        byte d = mem.read(tempSP);
+                    byte[] tempSP = iterateRegister(SP, -4);
+                    byte a = mem.read(tempSP);
+                    tempSP = iterateRegister(SP, -3);
+                    byte b = mem.read(tempSP);
+                    tempSP = iterateRegister(SP, -2);
+                    byte c = mem.read(tempSP);
+                    tempSP = iterateRegister(SP, -1);
+                    byte d = mem.read(tempSP);
 					short value1 = (short) (((a) << 8) | (b));
-                                        short value2 = (short) (((c) << 8) | (d));
-                                        short sum = (short) (value1 - value2);
-                                        byte a1 = (byte) sum;
-                                        byte a2 = (byte) (sum >> 8);
+                    short value2 = (short) (((c) << 8) | (d));
+                    short sum = (short) (value1 - value2);
+                    byte a1 = (byte) sum;
+                    byte a2 = (byte) (sum >> 8);
 
-                                        tempSP = iterateAndConvert(SP, -2);
-                                        mem.write(tempSP, a1);
-                                        tempSP = iterateAndConvert(SP, -3);
-                                        mem.write(tempSP, a2);
-                                        tempSP = iterateRegister(this.SP, -2);
-                                        this.SP = tempSP;
-                                        this.IC = iterateRegister(this.IC, 1);
+                    tempSP = iterateRegister(SP, -2);
+                    mem.write(tempSP, a1);
+                    tempSP = iterateRegister(SP, -3);
+                    mem.write(tempSP, a2);
+                    tempSP = iterateRegister(this.SP, -2);
+                    this.SP = tempSP;
+                    this.IC = iterateRegister(this.IC, 1);
                                         
-                                        break;
-
+                    break;
 				}
 				
 				case MUL: {
 
-					byte[] tempSP = iterateAndConvert(SP, -3);
-                                        byte a = mem.read(tempSP);
-                                        tempSP = iterateAndConvert(SP, -2);
-                                        byte b = mem.read(tempSP);
-                                        tempSP = iterateAndConvert(SP, -1);
-                                        byte c = mem.read(tempSP);
-                                        tempSP = iterateAndConvert(SP, 0);
-                                        byte d = mem.read(tempSP);
+					byte[] tempSP = iterateRegister(SP, -4);
+                    byte a = mem.read(tempSP);
+                    tempSP = iterateRegister(SP, -3);
+                    byte b = mem.read(tempSP);
+                    tempSP = iterateRegister(SP, -2);
+                    byte c = mem.read(tempSP);
+					tempSP = iterateRegister(SP, -1);
+                    byte d = mem.read(tempSP);
 					short value1 = (short) (((a) << 8) | (b));
-                                        short value2 = (short) (((c) << 8) | (d));
-                                        short sum = (short) (value1 * value2);
-                                        byte a1 = (byte) sum;
-                                        byte a2 = (byte) (sum >> 8);
+                    short value2 = (short) (((c) << 8) | (d));
+                    short sum = (short) (value1 * value2);
+                    byte a1 = (byte) sum;
+                    byte a2 = (byte) (sum >> 8);
 
-                                        tempSP = iterateAndConvert(SP, -2);
-                                        mem.write(tempSP, a1);
-                                        tempSP = iterateAndConvert(SP, -3);
-                                        mem.write(tempSP, a2);
+                    tempSP = iterateRegister(SP, -2);
+                    mem.write(tempSP, a1);
+                    tempSP = iterateRegister(SP, -3);
+                    mem.write(tempSP, a2);
 
-                                        tempSP = iterateRegister(this.SP, -2);
+                    tempSP = iterateRegister(this.SP, -2);
                                         
-                                        this.SP = tempSP;
-                                        this.IC = iterateRegister(this.IC, 1);
+                    this.SP = tempSP;
+                    this.IC = iterateRegister(this.IC, 1);
                                         
-                                        break;
+                    break;
 				}
 				
 				case DIV: {
 
-					byte[] tempSP = iterateAndConvert(SP, -3);
-                                        byte a = mem.read(tempSP);
-                                        tempSP = iterateAndConvert(SP, -2);
-                                        byte b = mem.read(tempSP);
-                                        tempSP = iterateAndConvert(SP, -1);
-                                        byte c = mem.read(tempSP);
-                                        tempSP = iterateAndConvert(SP, 0);
-                                        byte d = mem.read(tempSP);
+					byte[] tempSP = iterateRegister(SP, -4);
+                    byte a = mem.read(tempSP);
+                    tempSP = iterateRegister(SP, -3);
+                    byte b = mem.read(tempSP);
+                    tempSP = iterateRegister(SP, -2);
+                    byte c = mem.read(tempSP);
+                    tempSP = iterateRegister(SP, -1);
+                    byte d = mem.read(tempSP);
 					short value1 = (short) (((a) << 8) | (b));
-                                        short value2 = (short) (((c) << 8) | (d));
-                                        short sum = (short) (value1 / value2);
-                                        byte a1 = (byte) sum;
-                                        byte a2 = (byte) (sum >> 8);
+                    short value2 = (short) (((c) << 8) | (d));
+                    short sum = (short) (value1 / value2);
+                    byte a1 = (byte) sum;
+                    byte a2 = (byte) (sum >> 8);
 
-                                        tempSP = iterateAndConvert(SP, -2);
-                                        mem.write(tempSP, a1);
-                                        tempSP = iterateAndConvert(SP, -3);
-                                        mem.write(tempSP, a2);
+                    tempSP = iterateRegister(SP, -2);
+                    mem.write(tempSP, a1);
+                    tempSP = iterateRegister(SP, -3);
+                    mem.write(tempSP, a2);
 
-                                        tempSP = iterateRegister(this.SP, -2);
+                    tempSP = iterateRegister(this.SP, -2);
                                         
-                                        this.SP = tempSP;
-                                        this.IC = iterateRegister(this.IC, 1);
+                    this.SP = tempSP;
+                    this.IC = iterateRegister(this.IC, 1);
                                         
-                                        break;
+                    break;
 				}
 				
 				case CMP: {
 					System.out.println("CMP");
-					byte[] sp = addressConversion(this.SP);
+					byte[] sp = this.SP;
+					sp = iterateRegister(this.SP, -1);
 					byte x = mem.read(sp);
-					sp = iterateAndConvert(this.SP, -1);
+					sp = iterateRegister(this.SP, -2);
 					byte y = mem.read(sp);
 	
 					if(x == y){
@@ -353,9 +394,9 @@ public class CPU{
 				}
 				
 				case JP: {
-					byte[] ic = iterateAndConvert(this.IC, 1);
+					byte[] ic = iterateRegister(this.IC, 1);
 					byte x = mem.read(ic);
-					ic = iterateAndConvert(this.IC, 2);
+					ic = iterateRegister(this.IC, 2);
 					byte y = mem.read(ic);
 					byte[] xy = {x, y};
 					this.IC = xy;
@@ -364,9 +405,9 @@ public class CPU{
 				
 				case JG: {
 					if(CF == 1){
-						byte[] ic = iterateAndConvert(this.IC, 1);
+						byte[] ic = iterateRegister(this.IC, 1);
 						byte x = mem.read(ic);
-						ic = iterateAndConvert(this.IC, 2);
+						ic = iterateRegister(this.IC, 2);
 						byte y = mem.read(ic);
 						byte[] xy = {x, y};
 						this.IC = xy;
@@ -379,9 +420,9 @@ public class CPU{
 				
 				case JL: {
 					if(CF == (byte) 2){
-						byte[] ic = iterateAndConvert(this.IC, 1);
+						byte[] ic = iterateRegister(this.IC, 1);
 						byte x = mem.read(ic);
-						ic = iterateAndConvert(this.IC, 2);
+						ic = iterateRegister(this.IC, 2);
 						byte y = mem.read(ic);
 						byte[] xy = {x, y};
 						this.IC = xy;
@@ -394,9 +435,9 @@ public class CPU{
 				
 				case JE: {
 					if(CF == 0){
-						byte[] ic = iterateAndConvert(this.IC, 1);
+						byte[] ic = iterateRegister(this.IC, 1);
 						byte x = mem.read(ic);
-						ic = iterateAndConvert(this.IC, 2);
+						ic = iterateRegister(this.IC, 2);
 						byte y = mem.read(ic);
 						byte[] xy = {x, y};
 						this.IC = xy;
@@ -411,54 +452,50 @@ public class CPU{
 					System.out.println("STOP");
 					modeToSupervisor();
 					SI = 7;
-					this.IC = iterateRegister(this.IC, 1);
+					//this.IC = iterateRegister(this.IC, 1);
 					break;
 				}
 				
 				case PRINT: {
-					//modeToSupervisor();
 					System.out.println("PRINT");
 					SI = 1;
-					this.IC = iterateRegister(this.IC, 1);
-					callChannelDevice();
+					//this.IC = iterateRegister(this.IC, 1);
+					//callChannelDevice();
 					break;
 				}
 				
 				case PRINTI: {
-					//modeToSupervisor();
 					System.out.println("PRINTI");
 					SI = 2;
-					this.IC = iterateRegister(this.IC, 1);
-					callChannelDevice();
+					//this.IC = iterateRegister(this.IC, 1);
+					//callChannelDevice();
 					break;
 				}
 				
 				case READ: {
-					//modeToSupervisor();
 					System.out.println("READ");
 					SI = 3;
-					this.IC = iterateRegister(this.IC, 1);
-					callChannelDevice();
+					//this.IC = iterateRegister(this.IC, 1);
+					//callChannelDevice();
 					break;
 				}
 				
 				case READI: {
-					//modeToSupervisor();
 					System.out.println("READI");
 					SI = 4;
-					this.IC = iterateRegister(this.IC, 1);
-					callChannelDevice();
+					//this.IC = iterateRegister(this.IC, 1);
+					//callChannelDevice();
 					break;
 				}
 				
 				case SETR: {
-					byte[] ic = iterateAndConvert(this.IC, 1);
+					byte[] ic = iterateRegister(this.IC, 1);
 					byte x1 = mem.read(ic);
-					ic = iterateAndConvert(this.IC, 2);
+					ic = iterateRegister(this.IC, 2);
 					byte y1 = mem.read(ic);
-					ic = iterateAndConvert(this.IC, 3);
+					ic = iterateRegister(this.IC, 3);
 					byte x2 = mem.read(ic);
-					ic = iterateAndConvert(this.IC, 4);
+					ic = iterateRegister(this.IC, 4);
 					byte y2 = mem.read(ic);
 					byte[] xy = {x1, y1, x2, y2};
 					this.R = xy;
@@ -494,11 +531,14 @@ public class CPU{
 
 	public void modeToUser() {
 		MODE = 0;
-		IC[0] = 0;
-		IC[1] = 0;
-		SP[0] = 12;
-		SP[1] = 0;
-
+		byte[] ic_0 = {(byte) 11, (byte) (4*(PTR-1))};
+		byte[] ic_1 = {(byte) 11, (byte) (4*(PTR-1) + 1)};
+		byte[] sp_0 = {(byte) 11, (byte) (4*(PTR-1) + 2)};
+		byte[] sp_1 = {(byte) 11, (byte) (4*(PTR-1) + 3)};
+		IC[0] = mem.read(ic_0);
+		IC[1] = mem.read(ic_1);
+		SP[0] = mem.read(sp_0);
+		SP[1] = mem.read(sp_1);
 	}
 	
 	public void callChannelDevice(){
@@ -507,32 +547,40 @@ public class CPU{
 		CDR[2] = R[1];
 		CDR[3] = R[2];
 		CDR[4] = R[3];
+		modeToSupervisor();
 		channeldevice.setMemory(this.mem);
 		channeldevice.command(CDR);
+		modeToUser();
+		SI = 0;
 	}
 	
 	private void checkInterrupts(){
 		switch(SI){
 			case 1: {
+				callChannelDevice();
 				break;
 			}
 			
 			case 2: {
+				callChannelDevice();
 				break;
 			}
 			
 			case 3: {
+				callChannelDevice();
 				break;
 			}
 			
 			case 4: {
+				callChannelDevice();
 				break;
 			}
-			
+
 			default: {
 				break;
-			}
+			}	
 		}
+		//modeToUser();
 		//System.out.println("SI = " + SI);
 		SI = 0;
 		

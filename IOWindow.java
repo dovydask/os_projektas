@@ -19,7 +19,7 @@ public class IOWindow extends JPanel {
 	public IOWindow(boolean isInput) {
 		setLayout(new MigLayout("", "[grow][]", "[][grow]"));
 
-		JLabel lbl_IO = new JLabel(isInput ? "Input screen" : "Output screen");
+		JLabel lbl_IO = new JLabel(isInput ? "Input" : "Output");
 		add(lbl_IO, "cell 0 0");
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -65,7 +65,7 @@ public class IOWindow extends JPanel {
 	}
 	
 	public void appendOutput(String s){
-		textArea.append(">"+s+"\n");
+		textArea.append(s+"\n");
 	}
 
 }
