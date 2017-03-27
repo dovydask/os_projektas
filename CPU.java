@@ -1,4 +1,4 @@
-public class CPU{
+taipublic class CPU{
 	
 	public final static byte PUSH = 	(byte) 10;
 	public final static byte POP = 		(byte) 20;
@@ -252,35 +252,35 @@ public class CPU{
 				
 				case ADD: {
 					System.out.println("Add");
-                    byte[] tempSP = iterateRegister(SP, -4);
-                    byte a = mem.read(tempSP);
-                    tempSP = iterateRegister(SP, -3);
-                    byte b = mem.read(tempSP);
-                    tempSP = iterateRegister(SP, -2);
-                    byte c = mem.read(tempSP);
-                    tempSP = iterateRegister(SP, -1);
-                    byte d = mem.read(tempSP);
+                                        byte[] tempSP = iterateRegister(SP, -4);
+                                        byte a = mem.read(tempSP);
+                                        tempSP = iterateRegister(SP, -3);
+                                        byte b = mem.read(tempSP);
+                                        tempSP = iterateRegister(SP, -2);
+                                        byte c = mem.read(tempSP);
+                                        tempSP = iterateRegister(SP, -1);
+                                        byte d = mem.read(tempSP);
 					
 					System.out.println("A: "+ a);
 					System.out.println("B: "+ b);
 					System.out.println("C: "+ c);
 					System.out.println("D: "+ d);
 					
-                    short value1 = (short) (((a) << 8) | (b));
-                    short value2 = (short) (((c) << 8) | (d));
-                    short sum = (short) (value1 + value2);
-                    byte a1 = (byte) sum;
-                    byte a2 = (byte) (sum >> 8);
+                                        short value1 = (short) (((a) << 8) | (b));
+                                        short value2 = (short) (((c) << 8) | (d));
+                                        short sum = (short) (value1 + value2);
+                                        byte a1 = (byte) sum;
+                                        byte a2 = (byte) (sum >> 8);
 
-                    tempSP = iterateRegister(SP, -2);
-                    mem.write(tempSP, a1);
-                    tempSP = iterateRegister(SP, -3);
-                    mem.write(tempSP, a2);
+                                        tempSP = iterateRegister(SP, -3);
+                                        mem.write(tempSP, a1);
+                                        tempSP = iterateRegister(SP, -4);
+                                        mem.write(tempSP, a2);
 
-                    tempSP = iterateRegister(this.SP, -2);
+                                        tempSP = iterateRegister(this.SP, -2);
                                         
-                    this.SP = tempSP;
-                    this.IC = iterateRegister(this.IC, 1);
+                                        this.SP = tempSP;
+                                        this.IC = iterateRegister(this.IC, 1);
                    
 					break;
 				
@@ -303,9 +303,9 @@ public class CPU{
                     byte a1 = (byte) sum;
                     byte a2 = (byte) (sum >> 8);
 
-                    tempSP = iterateRegister(SP, -2);
-                    mem.write(tempSP, a1);
                     tempSP = iterateRegister(SP, -3);
+                    mem.write(tempSP, a1);
+                    tempSP = iterateRegister(SP, -4);
                     mem.write(tempSP, a2);
                     tempSP = iterateRegister(this.SP, -2);
                     this.SP = tempSP;
@@ -330,9 +330,9 @@ public class CPU{
                     byte a1 = (byte) sum;
                     byte a2 = (byte) (sum >> 8);
 
-                    tempSP = iterateRegister(SP, -2);
-                    mem.write(tempSP, a1);
                     tempSP = iterateRegister(SP, -3);
+                    mem.write(tempSP, a1);
+                    tempSP = iterateRegister(SP, -4);
                     mem.write(tempSP, a2);
 
                     tempSP = iterateRegister(this.SP, -2);
@@ -345,7 +345,7 @@ public class CPU{
 				
 				case DIV: {
 
-					byte[] tempSP = iterateRegister(SP, -4);
+                    byte[] tempSP = iterateRegister(SP, -4);
                     byte a = mem.read(tempSP);
                     tempSP = iterateRegister(SP, -3);
                     byte b = mem.read(tempSP);
@@ -353,15 +353,15 @@ public class CPU{
                     byte c = mem.read(tempSP);
                     tempSP = iterateRegister(SP, -1);
                     byte d = mem.read(tempSP);
-					short value1 = (short) (((a) << 8) | (b));
+                    short value1 = (short) (((a) << 8) | (b));
                     short value2 = (short) (((c) << 8) | (d));
                     short sum = (short) (value1 / value2);
                     byte a1 = (byte) sum;
                     byte a2 = (byte) (sum >> 8);
 
-                    tempSP = iterateRegister(SP, -2);
-                    mem.write(tempSP, a1);
                     tempSP = iterateRegister(SP, -3);
+                    mem.write(tempSP, a1);
+                    tempSP = iterateRegister(SP, -4);
                     mem.write(tempSP, a2);
 
                     tempSP = iterateRegister(this.SP, -2);
