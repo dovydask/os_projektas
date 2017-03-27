@@ -1,4 +1,4 @@
-taipublic class CPU{
+public class CPU{
 	
 	public final static byte PUSH = 	(byte) 10;
 	public final static byte POP = 		(byte) 20;
@@ -170,7 +170,7 @@ taipublic class CPU{
 	
 	//Masininis ciklas
 	public void cycle(){
-		
+		System.out.println("TI = "+ TI);
 		if(TI == 0){
 			modeToSupervisor();
 		}
@@ -225,9 +225,9 @@ taipublic class CPU{
 					temp = iterateRegister(this.IC, 2);
 					byte y = mem.read(temp);
 					byte[] xy = {x, y};
-					System.out.println(mem.read(xy));
+					//System.out.println(mem.read(xy));
 					//xy = addressConversion(xy);
-					System.out.println(mem.read(xy));
+					//System.out.println(mem.read(xy));
 					sp = iterateRegister(sp, 1);
 					mem.write(xy, SP);
 					this.SP = iterateRegister(this.SP, 1);
@@ -251,7 +251,7 @@ taipublic class CPU{
 				}
 				
 				case ADD: {
-					System.out.println("Add");
+					System.out.println("ADD");
                                         byte[] tempSP = iterateRegister(SP, -4);
                                         byte a = mem.read(tempSP);
                                         tempSP = iterateRegister(SP, -3);
@@ -260,17 +260,25 @@ taipublic class CPU{
                                         byte c = mem.read(tempSP);
                                         tempSP = iterateRegister(SP, -1);
                                         byte d = mem.read(tempSP);
-					
+					/*
 					System.out.println("A: "+ a);
 					System.out.println("B: "+ b);
 					System.out.println("C: "+ c);
 					System.out.println("D: "+ d);
-					
+					*/
                                         short value1 = (short) (((a) << 8) | (b));
                                         short value2 = (short) (((c) << 8) | (d));
                                         short sum = (short) (value1 + value2);
-                                        byte a1 = (byte) sum;
-                                        byte a2 = (byte) (sum >> 8);
+                                       byte a1;
+										byte a2;
+										if(sum < (short) 0x0F){
+											a1 = (byte) sum;
+											a2 = (byte) (sum >> 8);
+										}
+										else{
+											a1 = (byte) sum;
+											a2 = (byte) (sum >> 8);
+										}
 
                                         tempSP = iterateRegister(SP, -3);
                                         mem.write(tempSP, a1);
@@ -288,7 +296,7 @@ taipublic class CPU{
 				}
 				
 				case SUB: {
-
+					System.out.println("SUB");
                     byte[] tempSP = iterateRegister(SP, -4);
                     byte a = mem.read(tempSP);
                     tempSP = iterateRegister(SP, -3);
@@ -300,9 +308,18 @@ taipublic class CPU{
 					short value1 = (short) (((a) << 8) | (b));
                     short value2 = (short) (((c) << 8) | (d));
                     short sum = (short) (value1 - value2);
-                    byte a1 = (byte) sum;
-                    byte a2 = (byte) (sum >> 8);
-
+					
+					byte a1;
+					byte a2;
+					if(sum < (short) 0x0F){
+						a1 = (byte) sum;
+						a2 = (byte) (sum >> 8);
+					}
+					else{
+						a1 = (byte) sum;
+						a2 = (byte) (sum >> 8);
+					}
+					
                     tempSP = iterateRegister(SP, -3);
                     mem.write(tempSP, a1);
                     tempSP = iterateRegister(SP, -4);
@@ -315,7 +332,7 @@ taipublic class CPU{
 				}
 				
 				case MUL: {
-
+					System.out.println("MUL");
 					byte[] tempSP = iterateRegister(SP, -4);
                     byte a = mem.read(tempSP);
                     tempSP = iterateRegister(SP, -3);
@@ -344,7 +361,7 @@ taipublic class CPU{
 				}
 				
 				case DIV: {
-
+					System.out.println("DIV");
                     byte[] tempSP = iterateRegister(SP, -4);
                     byte a = mem.read(tempSP);
                     tempSP = iterateRegister(SP, -3);
@@ -402,6 +419,7 @@ taipublic class CPU{
 				}
 				
 				case JP: {
+					System.out.println("JP");
 					byte[] ic = iterateRegister(this.IC, 1);
 					byte x = mem.read(ic);
 					ic = iterateRegister(this.IC, 2);
@@ -413,6 +431,7 @@ taipublic class CPU{
 				
 				case JG: {
 					if(CF == 1){
+						System.out.println("JG");
 						byte[] ic = iterateRegister(this.IC, 1);
 						byte x = mem.read(ic);
 						ic = iterateRegister(this.IC, 2);
@@ -428,6 +447,7 @@ taipublic class CPU{
 				
 				case JL: {
 					if(CF == (byte) 2){
+						System.out.println("JL");
 						byte[] ic = iterateRegister(this.IC, 1);
 						byte x = mem.read(ic);
 						ic = iterateRegister(this.IC, 2);
@@ -443,6 +463,7 @@ taipublic class CPU{
 				
 				case JE: {
 					if(CF == 0){
+						System.out.println("JE");
 						byte[] ic = iterateRegister(this.IC, 1);
 						byte x = mem.read(ic);
 						ic = iterateRegister(this.IC, 2);
@@ -593,7 +614,7 @@ taipublic class CPU{
 			}	
 		}
 		//modeToUser();
-		//System.out.println("SI = " + SI);
+		System.out.println("SI = " + SI);
 		SI = 0;
 		
 		switch(PI){	
@@ -617,7 +638,7 @@ taipublic class CPU{
 				break;
 			}
 		}
-		//System.out.println("PI = " + PI);
+		System.out.println("PI = " + PI);
 		PI = 0;
 		
 		if(TI == 0){
