@@ -375,18 +375,26 @@ taipublic class CPU{
 				case CMP: {
 					System.out.println("CMP");
 					byte[] sp = this.SP;
-					sp = iterateRegister(this.SP, -1);
-					byte x = mem.read(sp);
+					sp = iterateRegister(this.SP, -4);
+					byte a = mem.read(sp);
+					sp = iterateRegister(this.SP, -3);
+					byte b = mem.read(sp);
+                        
 					sp = iterateRegister(this.SP, -2);
-					byte y = mem.read(sp);
+					byte c = mem.read(sp);
+					sp = iterateRegister(this.SP, -1);
+					byte d = mem.read(sp);
+                                        
+                                        short value1 = (short) (((a) << 8) | (b));
+                                        short value2 = (short) (((c) << 8) | (d));
 	
-					if(x == y){
+					if(value1 == value2){
 						CF = 0;
 					}
-					else if(x > y){
+					else if(value1 < value2){
 						CF = 1;
 					}
-					else if(x < y){
+					else if(value1 > value2){
 						CF = 2;
 					}
 					this.IC = iterateRegister(this.IC, 1);
@@ -452,6 +460,7 @@ taipublic class CPU{
 					System.out.println("STOP");
 					modeToSupervisor();
 					SI = 7;
+                                        TI = 0;
 					//this.IC = iterateRegister(this.IC, 1);
 					break;
 				}
