@@ -458,9 +458,7 @@ taipublic class CPU{
 				
 				case STOP: {
 					System.out.println("STOP");
-					modeToSupervisor();
-					SI = 7;
-                                        TI = 0;
+					SI = 5;
 					//this.IC = iterateRegister(this.IC, 1);
 					break;
 				}
@@ -582,6 +580,11 @@ taipublic class CPU{
 			
 			case 4: {
 				callChannelDevice();
+				break;
+			}
+				
+			case 5: {
+				TI = 0;
 				break;
 			}
 
