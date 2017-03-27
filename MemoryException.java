@@ -1,3 +1,0 @@
-class MemoryException extends Exception{
-	
-}
