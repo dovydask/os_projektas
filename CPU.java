@@ -585,26 +585,33 @@ public class CPU{
 	private void checkInterrupts(){
 		switch(SI){
 			case 1: {
+                                System.out.println("SI = " + SI);
 				callChannelDevice();
 				break;
 			}
 			
 			case 2: {
+                                System.out.println("SI = " + SI);
 				callChannelDevice();
 				break;
 			}
 			
 			case 3: {
+                                System.out.println("SI = " + SI);
 				callChannelDevice();
 				break;
 			}
 			
 			case 4: {
+                                System.out.println("SI = " + SI);
 				callChannelDevice();
 				break;
 			}
 				
 			case 5: {
+
+                                System.out.println("SI = " + SI);
+
 				TI = 0;
 				break;
 			}
@@ -619,18 +626,27 @@ public class CPU{
 		
 		switch(PI){	
 			case 1: {
+                                //System.out.println("PI = " + PI);
+                                //TI = 0;
 				break;
+                                
 			}
 			
 			case 2: {
+                                //System.out.println("PI = " + PI);
+                                //TI = 0;
 				break;
 			}
 			
 			case 3: {
+                                //System.out.println("PI = " + PI);
+                                //TI = 0;
 				break;
 			}
 			
 			case 4: {
+                                //System.out.println("PI = " + PI);
+                                //TI = 0;
 				break;
 			}
 			
@@ -641,11 +657,11 @@ public class CPU{
 		System.out.println("PI = " + PI);
 		PI = 0;
 		
-		if(TI == 0){
+		//if(TI == 0){
 			//TODO
-			System.out.println("TI = 0");
-			TI = 50;
-		}
+		//	System.out.println("TI = 0");
+		//	TI = 50;
+		//}
 	}
 	
 	public void setSP(byte[] SP){
