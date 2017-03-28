@@ -609,7 +609,9 @@ public class CPU{
 			}
 				
 			case 5: {
+
                                 System.out.println("SI = " + SI);
+
 				TI = 0;
 				break;
 			}
@@ -619,7 +621,7 @@ public class CPU{
 			}	
 		}
 		//modeToUser();
-		//System.out.println("SI = " + SI);
+		System.out.println("SI = " + SI);
 		SI = 0;
 		
 		switch(PI){	
@@ -652,7 +654,7 @@ public class CPU{
 				break;
 			}
 		}
-		//System.out.println("PI = " + PI);
+		System.out.println("PI = " + PI);
 		PI = 0;
 		
 		//if(TI == 0){
