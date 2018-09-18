@@ -1,6 +1,8 @@
 # os_projektas
 
-Multiprograminės operacinės sistemos projektas. 
-Suprojektuota pavyzdinė MOS pagrindinių jos funkcijų simuliacijai.
+Autoriai: Dovydas Kičiatovas, Dovilė Preidytė, Gerda Užubalytė
 
-Visas kodas parašytas Java kalba. Programos paleidimui naudoti main.java
+Multiprograminės operacinės sistemos projektas. 
+Suprojektuota pavyzdinė MOS pagrindinių jos funkcijų ir komponentų simuliacijai.
+
+Visas kodas parašytas Java programavimo kalba. Programos paleidimui naudoti Main.java
